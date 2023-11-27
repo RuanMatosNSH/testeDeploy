@@ -1,0 +1,107 @@
+{
+  "authenticatedUrls": [],
+  "author": "Henrique Garcez",
+  "config": {
+    "port": "3000"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "compression": "^1.7.3",
+    "express-basic-auth": "^1.2.0",
+    "express-winston": "^3.2.1",
+    "node-cache": "^4.2.1",
+    "request": "latest",
+    "response-time": "^2.3.2",
+    "serve-favicon": "latest",
+    "ssl-root-cas": "^1.3.1"
+  },
+  "description": "Sample extension to handle external services connections",
+  "devDependencies": {
+    "archiver": "latest",
+    "body-parser": "latest",
+    "express": "latest",
+    "gulp": "latest",
+    "gulp-jasmine": "latest",
+    "http-proxy-middleware": "^0.18.0",
+    "https-proxy-agent": "^2.2.2",
+    "jshint": "^2.12.0",
+    "nconf": "^0.10.0",
+    "node-fetch": "^2.1.2",
+    "nodemon": "^1.19.1",
+    "request": "latest",
+    "unirest": "^0.5.1",
+    "winston": "^3.3.3"
+  },
+  "license": "SEE LICENSE IN LICENSE.TXT",
+  "main": "/app/index.js",
+  "name": "customsse",
+  "allowedUrls": [
+    "https://apigw-pod1.dm-us.informaticacloud.com",
+    "https://api-legacy-orders-prod-iy5kvap7oa-rj.a.run.app",
+    "https://dm-us.informaticacloud.com",
+    "https://demo0263231.mockable.io/",
+    "https://mail-marketing-dot-grendene-digital-commerce.rj.r.appspot.com",
+    "https://store-credit-api-prd-iy5kvap7oa-rj.a.run.app",
+    "https://na1.ai.dm-us.informaticacloud.com",
+    "https://email-sending-iy5kvap7oa-uc.a.run.app",
+    "https://rest001.rsys9.net",
+    "https://titulos-prod-iy5kvap7oa-uc.a.run.app",
+    "https://generate-pdf-prod-dot-grendene-digital-commerce.rj.r.appspot.com",
+    "https://hub.makertec.com.br",
+    "https://us-central1-grendene-digital-commerce.cloudfunctions.net"
+  ],
+  "publicUrls": [
+    "/ccstorex/custom/public/profiles",
+    "/ccstorex/custom/public/profiles/legacy",
+    "/ccstorex/custom/public/profiles/verifyEmail",
+    "/ccstorex/custom/oldOrders/v1/",
+    "/ccstorex/custom/newsletter/v1/",
+    "/ccstorex/custom/test/login",
+    "/ccstorex/custom/test/external/proxy/shippingHook",
+    "/ccstorex/custom/test/external/simple/shippingHook",
+    "/ccstorex/custom/test/internal/shippingHook",
+    "/ccstorex/custom/trackCode/trackCode",
+    "/ccstorex/custom/storeCredit/history",
+    "/ccstorex/custom/storeCredit/balance",
+    "/ccstorex/custom/storeCredit/validateBalance",
+    "/ccstorex/custom/legacyCnpj/legacyCnpj",
+    "/ccstorex/custom/legacyCnpj/legacyCnpjSend",
+    "/ccstorex/custom/responsys/productOpened",
+    "/ccstorex/custom/responsys/collectionOpened",
+    "/ccstorex/custom/clientInfos/ip",
+    "/ccstorex/custom/b2bTitles/getTitles",
+    "/ccstorex/custom/b2bTitles/downloadTitles",
+    "/ccstorex/custom/b2bRepresentants/find",
+    "/ccstorex/custom/b2bOrders/generatePdf",
+    "/ccstorex/custom/hubApis/stores",
+    "/ccstorex/custom/hubApis/combinations",
+    "/ccstorex/custom/hubApis/productSearch",
+    "/ccstorex/custom/hubApis/shippingCosts",
+    "/ccstorex/custom/hubApis/reviews",
+    "/ccstorex/custom/hubApis/invoice",
+    "/ccstorex/custom/konviva/buildSsoUrl"
+  ],
+  "scripts": {
+    "deployOcc": "deployOcc.cmd",
+    "start": "node index.js",
+    "logdebug": "node .\\tools\\ServerLogs.js debug",
+    "loginfo": "node .\\tools\\ServerLogs.js info",
+    "logerror": "node .\\tools\\ServerLogs.js error"
+  },
+  "translations": [
+    {
+      "description": "Grendene SSE",
+      "language": "en_US",
+      "name": "Grendene SSE"
+    },
+    {
+      "description": "Grendene SSE",
+      "language": "es_ES",
+      "name": "Grendene SSE"
+    }
+  ],
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "version": "1.0.0"
+}
