@@ -42,7 +42,8 @@ jobs:
         id: changed_folders
         run: |
           base_commit=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}" | jq -r '.base.sha')
-          CHANGED_FOLDERS=$(git diff --name-only $base_commit..HEAD | grep '/' | sed 's|[^/]*$||' | sort -u)
+          git fetch origin $base_commit
+          CHANGED_FOLDERS=$(git diff --name-only FETCH_HEAD..HEAD | grep '/' | sed 's|[^/]*$||' | sort -u)
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
