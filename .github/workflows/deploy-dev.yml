@@ -41,7 +41,7 @@ jobs:
       - name: Identify changed folders
         id: changed_folders
         run: |
-          CHANGED_FOLDERS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '/' | sed 's|[^/]*$||' | sort -u)
+          CHANGED_FOLDERS=$(git diff --name-only ${{ github.event.before }} ${{ github.event.pull_request.head.sha }} | grep '/' | sed 's|[^/]*$||' | sort -u)
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
