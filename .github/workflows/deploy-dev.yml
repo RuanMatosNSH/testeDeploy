@@ -1,0 +1,77 @@
+
+name: Deploy - DEV
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  # push:
+  #   branches: [ "develop" ]
+  # pull_request:
+  #   branches: [ "develop" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      deploy_reset:
+        description: 'Deploy reset'
+        type: boolean
+        required: true
+        default: false
+      use_live_assets:
+        description: 'Use live assets'
+        type: boolean
+        required: true
+        default: false
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # To ensure that it will only run from the develop branch
+    if: github.ref == 'refs/heads/develop'
+
+    env:
+      NODE_OPTIONS: --max_old_space_size=8000
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.17.0
+
+      - name: Install yarn
+        run: npm install -g yarn
+
+      - name: Identify changed folders
+        id: changed_folders
+        run: |
+          CHANGED_FOLDERS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
+          echo "Changed folders: $CHANGED_FOLDERS"
+          echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
+
+      - name: Install dependencies and zip changed folders
+        run: |
+          for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
+            cd $folder
+            yarn install
+            cd ..
+            zip -r "$folder.zip" "$folder"
+          done
+
+      - name: Authenticate with OCC and Upload to Server Extensions
+        env:
+          OCC_ENDPOINT: ${{ secrets.OCC_ENDPOINT }}
+          OCC_API_TOKEN: ${{ secrets.OCC_API_TOKEN }}
+        run: |
+          OCC_ACCESS_TOKEN=$(curl -X POST -H "Authorization: Bearer $OCC_API_TOKEN" -d "grant_type=client_credentials" "$OCC_ENDPOINT/ccadmin/v1/login" | jq -r '.access_token')
+          echo "OCC Access Token: $OCC_ACCESS_TOKEN"
+          
+          for zip_file in $(find . -type f -name '*.zip'); do
+            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "file=@$zip_file" "$OCC_ENDPOINT/ccadmin/v1/server-extensions/upload"
+          done
