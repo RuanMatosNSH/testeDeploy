@@ -3,9 +3,6 @@ name: Deploy - DEV
 
 # Controls when the workflow will run
 on:
-  push:
-    branches:
-      - develop
   pull_request:
     branches:
       - develop
@@ -46,7 +43,7 @@ jobs:
       - name: Identify changed folders
         id: changed_folders
         run: |
-          CHANGED_FOLDERS='customProxyMiddleware'
+          CHANGED_FOLDERS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
