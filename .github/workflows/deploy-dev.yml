@@ -56,7 +56,7 @@ jobs:
             cd $folder
             yarn install
             cd ..
-            zip -r "$folder.zip" "$folder"/*
+            zip -r "$folder.zip" -j "$folder"/*
             unzip -l "$folder.zip"
           done
 
