@@ -59,7 +59,7 @@ jobs:
           OCC_ENDPOINT: ${{ secrets.OCC_ENDPOINT }}
           OCC_API_TOKEN: ${{ secrets.OCC_API_TOKEN }}
         run: |
-          OCC_ACCESS_TOKEN=$(curl -H "Content-type: application/x-www-form-urlencoded" \ -H "Authorization: Bearer $OCC_API_TOKEN" \ -d "grant_type=client_credentials" \ -X POST \ https://a7727193c1dev-admin.occa.ocs.oraclecloud.com/ccadmin/v1/login/ '.access_token')
+          OCC_ACCESS_TOKEN=$(curl -H "Content-type: application/x-www-form-urlencoded" \ -H "Authorization: Bearer $OCC_API_TOKEN" \ -d "grant_type=client_credentials" \ -X POST \ https://a7727193c1dev-admin.occa.ocs.oraclecloud.com/ccadmin/v1/login/ | jq -r '.access_token')
           echo "OCC Access Token: $OCC_ACCESS_TOKEN"
           
           for zip_file in $(find . -type f -name '*.zip'); do
