@@ -5,10 +5,7 @@ name: Deploy - DEV
 on:
   pull_request:
     types:
-      - closed
-  push:
-    branches:
-      - develop
+      - synchronize
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -46,10 +43,14 @@ jobs:
       - name: Fetch changes
         run: git fetch
 
+      - name: Get base commit
+        id: get_base_commit
+        run: echo "BASE_COMMIT=$(git rev-list -n 1 origin/${{ github.event.pull_request.base.ref }})" >> $GITHUB_ENV
+
       - name: Identify changed folders
         id: changed_folders
         run: |
-          CHANGED_FOLDERS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
+          CHANGED_FOLDERS=$(git diff --name-only ${{ env.BASE_COMMIT }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
