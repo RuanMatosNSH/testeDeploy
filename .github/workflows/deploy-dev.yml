@@ -59,7 +59,7 @@ jobs:
           OCC_ENDPOINT: ${{ secrets.OCC_ENDPOINT }}
           OCC_API_TOKEN: ${{ secrets.OCC_API_TOKEN }}
         run: |
-          OCC_ACCESS_TOKEN=$(curl --location '$OCC_ENDPOINT/ccadmin/v1/login/' \ --header 'Content-Type: application/x-www-form-urlencoded' \ --header 'Authorization: Bearer $OCC_API_TOKEN' \ --data-urlencode 'grant_type=client_credentials' '.access_token')
+          OCC_ACCESS_TOKEN=$(curl -H "Content-type: application/x-www-form-urlencoded" \ -H "Authorization: Bearer $OCC_API_TOKEN" \ -d "grant_type=client_credentials" \ -X POST \ $OCC_ENDPOINT/ccadmin/v1/login/" '.access_token')
           echo "OCC Access Token: $OCC_ACCESS_TOKEN"
           
           for zip_file in $(find . -type f -name '*.zip'); do
