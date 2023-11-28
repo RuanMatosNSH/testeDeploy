@@ -64,7 +64,7 @@ requestAdmin.interceptors.request.use(
     }
   },
   (error) => {
-    throw new Error("Erro no pré-login 11: \n" + error);
+    throw new Error("Erro no pré-login 113: \n" + error);
   }
 );
 
