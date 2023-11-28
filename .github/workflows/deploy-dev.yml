@@ -41,7 +41,7 @@ jobs:
         run: sudo apt-get install jq
 
       - name: Fetch changes
-        run: git fetch
+        run: git fetch origin ${{ github.event.before }}:${{ github.event.before }}
 
       - name: Get base commit
         id: get_base_commit
@@ -50,7 +50,7 @@ jobs:
       - name: Identify changed folders
         id: changed_folders
         run: |
-          CHANGED_FOLDERS=$(git diff --name-only ${{ env.BASE_COMMIT }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
+          CHANGED_FOLDERS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
