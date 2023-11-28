@@ -55,7 +55,7 @@ jobs:
           for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
             cd $folder
             yarn install
-            zip -r "$folder.zip" /*
+            zip -r "$folder.zip" "$folder"/*
             unzip -l "$folder.zip"
           done
 
