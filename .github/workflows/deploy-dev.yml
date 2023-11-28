@@ -46,14 +46,10 @@ jobs:
       - name: Fetch changes
         run: git fetch
 
-      - name: Get latest commit on develop
-        id: get_commit
-        run: echo "COMMIT_SHA=$(git rev-list -n 1 develop)" >> $GITHUB_ENV
-
       - name: Identify changed folders
         id: changed_folders
         run: |
-          CHANGED_FOLDERS=$(git diff --name-only ${{ env.COMMIT_SHA }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
+          CHANGED_FOLDERS=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep / | cut -d/ -f1 | sort -u)
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
