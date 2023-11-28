@@ -60,7 +60,7 @@ requestAdmin.interceptors.request.use(
 
       return config;
     } catch (error) {
-      throw new Error("Erro no login 123: \n" + error);
+      throw new Error("Erro no login 1234: \n" + error);
     }
   },
   (error) => {
