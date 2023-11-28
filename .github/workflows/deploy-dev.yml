@@ -66,7 +66,8 @@ jobs:
         run: |
           OCC_ACCESS_TOKEN=$(curl -X POST -H "Authorization: Bearer $OCC_API_TOKEN" -d "grant_type=client_credentials" "$OCC_ENDPOINT/ccadmin/v1/login/" | jq -r '.access_token')
           echo "OCC Access Token: $OCC_ACCESS_TOKEN"
-          
+          echo "Mandando zip code"
+
           for zip_file in $(find . -type f -name '*.zip'); do
             curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "file=@$zip_file" "$OCC_ENDPOINT/ccadmin/v1/server-extensions/upload"
           done
