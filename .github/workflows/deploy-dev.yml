@@ -58,6 +58,20 @@ jobs:
             cd ..
           done
 
+      - name: Check and remove specific modules
+        run: |
+          for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
+            cd $folder
+            # Lista de módulos a serem removidos
+            modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
+
+            for module in "${modules_to_remove[@]}"; do
+              yarn remove $module
+            done
+
+            cd ..
+          done
+
       - name: Zip changed folders
         run: |
           for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
