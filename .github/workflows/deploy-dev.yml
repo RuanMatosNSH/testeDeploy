@@ -51,8 +51,7 @@ jobs:
       - name: Identify changed folders
         id: changed_folders
         run: |
-          BASE_BRANCH=${{ github.event.before ||  github.base_ref }}
-          CHANGED_FOLDERS=$(git diff --name-only $BASE_BRANCH HEAD | grep / | cut -d/ -f1 | sort -u)
+          CHANGED_FOLDERS=$(git log --name-only --format="" -m -1 --first-parent --pretty=format:'' | grep '/' | cut -d'/' -f1 | sort -u)
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
