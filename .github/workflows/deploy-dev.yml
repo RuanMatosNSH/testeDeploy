@@ -57,6 +57,7 @@ jobs:
             yarn install
             cd ..
             zip -r "$folder.zip" "$folder"/*
+            unzip -l "$folder.zip"
           done
 
       - name: Authenticate with OCC and Upload to Server Extensions
