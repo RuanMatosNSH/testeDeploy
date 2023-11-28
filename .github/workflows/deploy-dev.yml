@@ -47,7 +47,7 @@ jobs:
       - name: Identify changed folders
         id: changed_folders
         run: |
-          CHANGED_FOLDERS=$(git log --name-only --format="" -n 1 --pretty=format:'' | grep '/' | cut -d'/' -f1 | grep -v '^\.github$' | sort -u | tr '\n' ' ')
+          CHANGED_FOLDERS=$(git log -1 --name-only --format="" --pretty=format:'' | grep '/' | cut -d'/' -f1 | grep -v '^\.github$' | sort -u | tr '\n' ' ')
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
