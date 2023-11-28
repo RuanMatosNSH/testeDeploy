@@ -50,13 +50,26 @@ jobs:
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
 
-      - name: Install dependencies and zip changed folders
+      - name: Install dependencies
         run: |
           for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
             cd $folder
             yarn install
-            zip -r "$folder.zip" "$folder"/*
-            unzip -l "$folder.zip"
+            cd ..
+          done
+
+      - name: Zip changed folders
+        run: |
+          for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
+            cd $folder
+            zip -r "$folder.zip" *
+            cd ..
+          done
+
+      - name: Display contents of ZIP files
+        run: |
+          for zip_file in $(find . -type f -name '*.zip'); do
+            unzip -l "$zip_file"
           done
 
       - name: Authenticate with OCC and Upload to Server Extensions
