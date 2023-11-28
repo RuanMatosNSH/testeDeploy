@@ -56,7 +56,7 @@ jobs:
             cd $folder
             yarn install
             cd ..
-            zip -r "$folder.zip" "$folder"
+            zip -r "$folder.zip" "$folder"/*
           done
 
       - name: Authenticate with OCC and Upload to Server Extensions
@@ -69,5 +69,5 @@ jobs:
           echo "Mandando zip code"
 
           for zip_file in $(find . -type f -name '*.zip'); do
-            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "file=@$zip_file"  -F "filename=$(basename $zip_file)" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
+            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@$zip_file"  -F "filename=$(basename $zip_file)" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
           done
