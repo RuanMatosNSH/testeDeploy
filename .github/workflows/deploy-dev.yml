@@ -35,6 +35,11 @@ jobs:
       - name: Install yarn
         run: npm install -g yarn
 
+      - name: Debug
+        run: |
+          echo "OCC_ENDPOINT: $OCC_ENDPOINT"
+          echo "OCC_API_TOKEN: $OCC_API_TOKEN"
+
       - name: Install jq
         run: sudo apt-get install jq
 
