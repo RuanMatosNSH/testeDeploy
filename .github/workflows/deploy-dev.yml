@@ -42,11 +42,11 @@ jobs:
         run: |
           CHANGED_FOLDERS=$(git log --name-only --format="" -m -1 --first-parent | grep '/' | cut -d'/' -f1 | grep -v '^\.github$' | sort -u | tr '\n' ' ')
           echo "Changed folders: $CHANGED_FOLDERS"
-          echo "::set-output name=changed_folders::$CHANGED_FOLDERS"
+          echo "CHANGED_FOLDERS=$CHANGED_FOLDERS" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
-          for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
+          for folder in ${{ env.CHANGED_FOLDERS }}; do
             cd $folder
             yarn install
             cd ..
@@ -54,11 +54,11 @@ jobs:
 
       - name: Check and remove specific modules
         run: |
-          for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
+          for folder in ${{ env.CHANGED_FOLDERS }}; do
             cd $folder
             # Lista de módulos a serem removidos
             modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
-              
+
             for module in "${modules_to_remove[@]}"; do
               # Verifica se o módulo está instalado antes de tentar removê-lo
               if yarn list --depth=0 | grep -q $module; then
@@ -67,13 +67,13 @@ jobs:
                 echo "O módulo $module não está instalado em $folder."
               fi
             done
-              
+
             cd ..
           done
 
       - name: Zip changed folders
         run: |
-          for folder in ${{ steps.changed_folders.outputs.changed_folders }}; do
+          for folder in ${{ env.CHANGED_FOLDERS }}; do
             cd $folder
             zip -r "$folder.zip" *
             cd ..
