@@ -5,7 +5,7 @@ const env = require('../utils/EnvironmentVariables')
 
 router.get('/get-postal-code', async(req,res)=>{
   try {
-    /* 12345678910 */
+    /* 1234567891011 */
       if( !(req.query && req.query.postalCode) ) {
         return res.status(env.HTTP_CODE_BAD_REQUEST).json({ 
           success: false, 
