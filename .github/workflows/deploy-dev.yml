@@ -24,6 +24,8 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
       - uses: actions/setup-node@v3
         with:
@@ -39,9 +41,6 @@ jobs:
 
       - name: Install jq
         run: sudo apt-get install jq
-
-      - name: Fetch changes
-        run: git fetch origin
 
 
       - name: Identify changed folders
