@@ -34,14 +34,8 @@ jobs:
       - name: Install yarn
         run: npm install -g yarn
 
-      - name: Debug
-        run: |
-          echo "OCC_ENDPOINT: $OCC_ENDPOINT"
-          echo "OCC_API_TOKEN: $OCC_API_TOKEN"
-
       - name: Install jq
         run: sudo apt-get install jq
-
 
       - name: Identify changed folders
         id: changed_folders
@@ -64,11 +58,16 @@ jobs:
             cd $folder
             # Lista de módulos a serem removidos
             modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
-
+              
             for module in "${modules_to_remove[@]}"; do
-              yarn remove $module
+              # Verifica se o módulo está instalado antes de tentar removê-lo
+              if yarn list --depth=0 | grep -q $module; then
+                yarn remove $module
+              else
+                echo "O módulo $module não está instalado em $folder."
+              fi
             done
-
+              
             cd ..
           done
 
