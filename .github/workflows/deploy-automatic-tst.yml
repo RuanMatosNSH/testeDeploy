@@ -87,10 +87,8 @@ jobs:
           echo "OCC Access Token: $OCC_ACCESS_TOKEN"
           echo "Mandando zip code"
 
-          for folder in ${{ env.CHANGED_FOLDERS }}; do
-            cd $folder
+          for folder in ${{ env.CHANGED_FOLDERS }}; do   
             zip_file="${folder}.zip"
             echo "Enviando $zip_file para $OCC_ENDPOINT/ccadmin/v1/serverExtensions"
             curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${zip_file}" -F "filename=${zip_file}" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
-            cd ..
           done
