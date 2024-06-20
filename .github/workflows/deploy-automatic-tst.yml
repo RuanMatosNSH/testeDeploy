@@ -57,19 +57,19 @@ jobs:
           for folder in ${{ env.CHANGED_FOLDERS }}; do
             if [ -f "$folder/package.json" ]; then
               if jq -e '.ignoreConflict' "$folder/package.json" > /dev/null; then
-                echo "::set-output name=ignoreConflict_$folder::true"
+                echo "::set-output name=ignoreConflict::$folder:true"
               else
-                echo "::set-output name=ignoreConflict_$folder::false"
+                echo "::set-output name=ignoreConflict::$folder:false"
               fi
             else
-              echo "::set-output name=ignoreConflict_$folder::false"
+              echo "::set-output name=ignoreConflict::$folder:false"
             fi
           done
 
       - name: Check and remove specific modules
         run: |
           for folder in ${{ env.CHANGED_FOLDERS }}; do
-            if [ "${{ steps.check_ignoreConflict.outputs.ignoreConflict_$folder }}" != 'true' ]; then
+            if [ "$(echo ${{ steps.check_ignoreConflict.outputs.ignoreConflict }} | jq .$folder)" != 'true' ]; then
               cd $folder
               # Lista de módulos a serem removidos
               modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
