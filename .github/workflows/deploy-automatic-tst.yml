@@ -1,4 +1,3 @@
-
 name: Deploy - TST - Automático
 
 # Controls when the workflow will run
@@ -79,7 +78,6 @@ jobs:
             cd ..
           done
 
-
       - name: Authenticate with OCC and Upload to Server Extensions
         env:
           OCC_ENDPOINT: ${{ secrets.OCC_TST_ENDPOINT }}
@@ -90,7 +88,5 @@ jobs:
           echo "Mandando zip code"
 
           for folder in ${{ env.CHANGED_FOLDERS }}; do
-            cd $folder
-            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@$folder/$folder.zip"  -F "filename=$(basename $folder.zip)" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
-            cd ..
+            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${folder}/${folder}.zip" -F "filename=${folder}.zip" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
           done
