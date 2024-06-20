@@ -54,30 +54,37 @@ jobs:
       - name: Check if ignoreConflict flag is active
         id: check_ignoreConflict
         run: |
-          if jq -e '.ignoreConflict' package.json > /dev/null; then
-            echo "::set-output name=ignoreConflict::true"
-          else
-            echo "::set-output name=ignoreConflict::false"
-          fi
+          for folder in ${{ env.CHANGED_FOLDERS }}; do
+            if [ -f "$folder/package.json" ]; then
+              if jq -e '.ignoreConflict' "$folder/package.json" > /dev/null; then
+                echo "::set-output name=ignoreConflict_$folder::true"
+              else
+                echo "::set-output name=ignoreConflict_$folder::false"
+              fi
+            else
+              echo "::set-output name=ignoreConflict_$folder::false"
+            fi
+          done
 
       - name: Check and remove specific modules
-        if: steps.check_ignoreConflict.outputs.ignoreConflict == 'false'
         run: |
           for folder in ${{ env.CHANGED_FOLDERS }}; do
-            cd $folder
-            # Lista de módulos a serem removidos
-            modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
+            if [ "${{ steps.check_ignoreConflict.outputs.ignoreConflict_$folder }}" != 'true' ]; then
+              cd $folder
+              # Lista de módulos a serem removidos
+              modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
 
-            for module in "${modules_to_remove[@]}"; do
-              # Verifica se o módulo está instalado antes de tentar removê-lo
-              if yarn list --depth=0 | grep -q $module; then
-                yarn remove $module
-              else
-                echo "O módulo $module não está instalado em $folder."
-              fi
-            done
+              for module in "${modules_to_remove[@]}"; do
+                # Verifica se o módulo está instalado antes de tentar removê-lo
+                if yarn list --depth=0 | grep -q $module; then
+                  yarn remove $module
+                else
+                  echo "O módulo $module não está instalado em $folder."
+                fi
+              done
 
-            cd ..
+              cd ..
+            fi
           done
 
       - name: Zip changed folders
@@ -101,5 +108,5 @@ jobs:
             zip_file="${folder}.zip"
             echo "Enviando $zip_file para $OCC_ENDPOINT/ccadmin/v1/serverExtensions"
             curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${GITHUB_WORKSPACE}/${zip_file}" -F "filename=${zip_file}" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
-            sleep 5
+            sleep 2
           done
