@@ -54,14 +54,14 @@ jobs:
                       ignoreConflict=$(jq -r '.ignoreConflict' "$folder/package.json" || echo "false")
                       echo "::set-output name=ignoreConflict::$ignoreConflict"
                     else
-                      echo "::set-output name=ignoreConflict::$folder:false"
+                      echo "::set-output name=ignoreConflict_${folder}::false"
                     fi
                   done
 
             - name: Check and remove specific modules
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
-                    ignoreConflict=$(echo "${{ steps.check_ignoreConflict.outputs.ignoreConflict_$folder }}")
+                    ignoreConflict=$(echo "${{ steps.check_ignoreConflict.outputs['ignoreConflict_' . $folder] }}")
                     if [ "$ignoreConflict" != 'true' ]; then
                       cd $folder
                       # Lista de módulos a serem removidos
