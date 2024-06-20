@@ -52,9 +52,9 @@ jobs:
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
                     if [ -f "$folder/package.json" ]; then
                       ignoreConflict=$(jq -r '.ignoreConflict' "$folder/package.json" || echo "false")
-                      echo "::set-output name=ignoreConflict::$ignoreConflict"
+                      echo "::set-output name=ignoreConflict_$folder::$ignoreConflict"
                     else
-                      echo "::set-output name=ignoreConflict_${folder}::false"
+                      echo "::set-output name=ignoreConflict_$folder::false"
                     fi
                   done
 
