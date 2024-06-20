@@ -8,12 +8,12 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially ou in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # This workflow contains a single job chamado "build"
   build:
-    # The type of runner that the job will run on
+    # The type of runner que o job will run on
     runs-on: ubuntu-latest
 
-    # To ensure that it will only run from the develop branch
+    # To ensure que it will only run from the develop branch
     if: github.ref == 'refs/heads/develop'
 
     env:
@@ -51,7 +51,17 @@ jobs:
             cd ..
           done
 
+      - name: Check if ignoreConflict flag is active
+        id: check_ignoreConflict
+        run: |
+          if jq -e '.ignoreConflict' package.json > /dev/null; then
+            echo "::set-output name=ignoreConflict::true"
+          else
+            echo "::set-output name=ignoreConflict::false"
+          fi
+
       - name: Check and remove specific modules
+        if: steps.check_ignoreConflict.outputs.ignoreConflict == 'false'
         run: |
           for folder in ${{ env.CHANGED_FOLDERS }}; do
             cd $folder
@@ -87,7 +97,7 @@ jobs:
           echo "OCC Access Token: $OCC_ACCESS_TOKEN"
           echo "Mandando zip code"
 
-          for folder in ${{ env.CHANGED_FOLDERS }}; do   
+          for folder in ${{ env.CHANGED_FOLDERS }}; do
             zip_file="${folder}.zip"
             echo "Enviando $zip_file para $OCC_ENDPOINT/ccadmin/v1/serverExtensions"
             curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${GITHUB_WORKSPACE}/${zip_file}" -F "filename=${zip_file}" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
