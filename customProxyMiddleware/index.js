@@ -5,7 +5,7 @@ var app = require('./app/index');
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
-// Read port from command line, config, or default teste Teste Ruan AGR vaiaaaaaaaadwdwa
+// Read port from command line, config, or default teste Teste Ruan AGR vaiaaaaaaaadwdwad wdawdawdwaa
 var port = (process.argv[2] || (process.env.npm_package_config_port || 3000));
 //awuidjuwh
 console.log('starting server...');
