@@ -39,7 +39,7 @@ jobs:
       - name: Identify changed folders
         id: changed_folders
         run: |
-          CHANGED_FOLDERS=$(git log --name-only --format="" -m -1 --first-parent | grep '/' | cut -d'/' -f1 | grep -v '^\.github$' | sort -u | tr '\n' ' ')
+          CHANGED_FOLDERS=$(git diff --name-only HEAD~1 HEAD | grep '/' | cut -d'/' -f1 | grep -v '^\.github$' | sort -u | tr '\n' ' ')
           echo "Changed folders: $CHANGED_FOLDERS"
           echo "CHANGED_FOLDERS=$CHANGED_FOLDERS" >> $GITHUB_ENV
 
@@ -73,9 +73,7 @@ jobs:
       - name: Zip changed folders
         run: |
           for folder in ${{ env.CHANGED_FOLDERS }}; do
-            cd $folder
-            zip -r "$folder.zip" *
-            cd ..
+            zip -r "${folder}.zip" "$folder"
           done
 
       - name: Authenticate with OCC and Upload to Server Extensions
@@ -88,5 +86,6 @@ jobs:
           echo "Mandando zip code"
 
           for folder in ${{ env.CHANGED_FOLDERS }}; do
-            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${folder}/${folder}.zip" -F "filename=${folder}.zip" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
+            zip_file="${folder}.zip"
+            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${zip_file}" -F "filename=${zip_file}" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
           done
