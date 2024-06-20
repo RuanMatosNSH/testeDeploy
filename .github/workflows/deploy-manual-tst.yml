@@ -1,6 +1,5 @@
 name: Deploy - TST - Manual
 
-# Controls when the workflow will run
 on:
     workflow_dispatch:
         inputs:
@@ -8,22 +7,16 @@ on:
                 description: "Insira os nomes das SSEs a serem enviadas, separados por espaços."
                 type: string
 
-# A workflow run is made up of one or more jobs that can run sequentially ou in parallel
 jobs:
-    # This workflow contains a single job chamado "build"
     build:
-        # The type of runner que o job will run on
         runs-on: ubuntu-latest
 
-        # To ensure que it will only run from the develop branch
         if: github.ref == 'refs/heads/develop'
 
         env:
             NODE_OPTIONS: --max_old_space_size=8000
 
-        # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
-            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v3
               with:
                   fetch-depth: 2
@@ -38,46 +31,23 @@ jobs:
             - name: Install jq
               run: sudo apt-get install jq
 
-            - name: Install dependencies
+            - name: Install dependencies and remove specific modules
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
                     cd $folder
                     yarn install
-                    cd ..
-                  done
-
-            - name: Check if ignoreConflict flag is active
-              id: check_ignoreConflict
-              run: |
-                  for folder in ${{ github.event.inputs.list_sse_names }}; do
-                    if [ -f "$folder/package.json" ]; then
-                      ignoreConflict=$(jq -r '.ignoreConflict' "$folder/package.json" || echo "false")
-                      echo "::set-output name=ignoreConflict_$folder::$ignoreConflict"
-                    else
-                      echo "::set-output name=ignoreConflict_$folder::false"
-                    fi
-                  done
-
-            - name: Check and remove specific modules
-              run: |
-                  for folder in ${{ github.event.inputs.list_sse_names }}; do
-                    ignoreConflict=$(echo "${{ steps.check_ignoreConflict.outputs['ignoreConflict_' . $folder] }}")
-                    if [ "$ignoreConflict" != 'true' ]; then
-                      cd $folder
-                      # Lista de módulos a serem removidos
+                    ignoreConflict=$(jq -r '.ignoreConflict // "false"' package.json)
+                    if [ "$ignoreConflict" != "true" ]; then
                       modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
-
                       for module in "${modules_to_remove[@]}"; do
-                        # Verifica se o módulo está instalado antes de tentar removê-lo
                         if yarn list --depth=0 | grep -q $module; then
                           yarn remove $module
                         else
                           echo "O módulo $module não está instalado em $folder."
                         fi
                       done
-
-                      cd ..
                     fi
+                    cd ..
                   done
 
             - name: Zip changed folders
