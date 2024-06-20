@@ -22,7 +22,7 @@ app.use(expressWinston.logger({
 }));
 
 try {
-  // Load all routes
+  // Load all routes Ruan teste adwadw
   require('./routes')(app, logger);
 } catch (e) {
   winston.error(e.message);

@@ -1,6 +1,7 @@
 {
   "authenticatedUrls": [],
   "author": "Henrique Garcez",
+  "ignoreConflict": true,
   "config": {
     "port": "3000"
   },
@@ -23,7 +24,7 @@
     "gulp": "latest",
     "gulp-jasmine": "latest",
     "http-proxy-middleware": "^0.18.0",
-    "https-proxy-agent": "^2.2.2",
+    "https-proxy-agent": "^5.0.1",
     "jshint": "^2.12.0",
     "nconf": "^0.10.0",
     "node-fetch": "^2.1.2",
@@ -45,10 +46,20 @@
     "https://na1.ai.dm-us.informaticacloud.com",
     "https://email-sending-iy5kvap7oa-uc.a.run.app",
     "https://rest001.rsys9.net",
+    "https://gbm1rs4-api.responsys.ocs.oraclecloud.com",
+    "https://geg1qsf-api.responsys.ocs.oraclecloud.com",
+    "https://gk71qiq-api.responsys.ocs.oraclecloud.com",
+    "https://ghd1qk2-api.responsys.ocs.oraclecloud.com",
+    "https://gcj1qke-api.responsys.ocs.oraclecloud.com",
+    "https://gb91qk1-api.responsys.ocs.oraclecloud.com",
+    "https://g991qjz-api.responsys.ocs.oraclecloud.com",
+    "https://gjb1qk0-api.responsys.ocs.oraclecloud.com",
     "https://titulos-prod-iy5kvap7oa-uc.a.run.app",
     "https://generate-pdf-prod-dot-grendene-digital-commerce.rj.r.appspot.com",
     "https://hub.makertec.com.br",
-    "https://us-central1-grendene-digital-commerce.cloudfunctions.net"
+    "https://us-central1-grendene-digital-commerce.cloudfunctions.net",
+    "https://gateway-facebook-tst-iy5kvap7oa-uc.a.run.app",
+    "https://gateway-facebook-prd-iy5kvap7oa-uc.a.run.app"
   ],
   "publicUrls": [
     "/ccstorex/custom/public/profiles",
@@ -68,6 +79,7 @@
     "/ccstorex/custom/legacyCnpj/legacyCnpjSend",
     "/ccstorex/custom/responsys/productOpened",
     "/ccstorex/custom/responsys/collectionOpened",
+    "/ccstorex/custom/responsys/sendWishlist",
     "/ccstorex/custom/clientInfos/ip",
     "/ccstorex/custom/b2bTitles/getTitles",
     "/ccstorex/custom/b2bTitles/downloadTitles",
@@ -79,7 +91,8 @@
     "/ccstorex/custom/hubApis/shippingCosts",
     "/ccstorex/custom/hubApis/reviews",
     "/ccstorex/custom/hubApis/invoice",
-    "/ccstorex/custom/konviva/buildSsoUrl"
+    "/ccstorex/custom/konviva/buildSsoUrl",
+    "/ccstorex/custom/facebook/sendEvent"
   ],
   "scripts": {
     "deployOcc": "deployOcc.cmd",

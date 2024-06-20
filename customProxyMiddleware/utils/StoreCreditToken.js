@@ -18,13 +18,17 @@ const requestAdmin = (module.exports = axios.create(baseAxiosConfig));
 
 // Login
 const login = async () => {
+  const STORE_CREDIT_PASSWORD = process.env.STORE_CREDIT_PASSWORD;
+  const STORE_CREDIT_USER = process.env.STORE_CREDIT_USER;
+  const STORE_CREDIT_HOST_DOMAIN = process.env.STORE_CREDIT_HOST_DOMAIN;
+
   try {
     return axios({
       method: "POST",
-      url: process.env.STORE_CREDIT_HOST_DOMAIN + "/auth",
+      url: STORE_CREDIT_HOST_DOMAIN + "/auth",
       data: {
-        user: process.env.STORE_CREDIT_USER,
-        password: process.env.STORE_CREDIT_PASSWORD,
+        user: STORE_CREDIT_USER,
+        password: STORE_CREDIT_PASSWORD,
       },
       httpsAgent: agent,
       rejectUnauthorized: false, // Avoid SSL Conflict
@@ -60,11 +64,11 @@ requestAdmin.interceptors.request.use(
 
       return config;
     } catch (error) {
-      throw new Error("Erro no login: \n" + error);
+      throw new Error("Erro no login 123456789101112: \n" + error);
     }
   },
   (error) => {
-    throw new Error("Erro no pré-login: \n" + error);
+    throw new Error("Erro no pré-login 11345: \n" + error);
   }
 );
 

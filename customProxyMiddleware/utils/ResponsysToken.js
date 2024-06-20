@@ -28,7 +28,7 @@ const login = async (siteId) => {
 
     return axios({
       method: "POST",
-      url: ENV_KEYS.host + "/auth/token",
+      url: ENV_KEYS.users[siteId].host + "/auth/token",
       data,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -59,7 +59,6 @@ requestAdmin.interceptors.request.use(
           return config;
         }
       }
-
       const response = await login(siteId);
       const token = response.data.authToken;
       config.headers.Authorization = token;
