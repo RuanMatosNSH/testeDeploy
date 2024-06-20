@@ -1,7 +1,7 @@
 const SearchPostalCodeService = require('../services/SearchPostalCodeService');
 
 class SearchPostalCodeController {
-  /* Ruan teste */
+  /* Ruan teste awdawd */
       async getPostalCode(postalCode){
          return new Promise(async (resolve, reject) => {
            try {             
