@@ -1,9 +1,12 @@
 const axiConfig = require("../../utils/OCCToken");
 const express = require("express");
 var router = express.Router();
-const nconf = require('nconf');
+const nconf = require("nconf");
+const axios = require("axios");
 
-const HOST = nconf.get('atg.server.admin.url') ? String(nconf.get('atg.server.admin.url')).replace('/zaxy', '') : 'https://a7727193c1tst-admin.occa.ocs.oraclecloud.com'
+const HOST = nconf.get("atg.server.admin.url")
+  ? String(nconf.get("atg.server.admin.url")).replace("/zaxy", "")
+  : "https://a7727193c1tst-admin.occa.ocs.oraclecloud.com";
 const ENV = "/ccadmin/v1/";
 
 router.get("/profiles", function (request, response) {
@@ -12,7 +15,10 @@ router.get("/profiles", function (request, response) {
     return;
   }
 
-  let fullUrl = HOST + ENV + `/profiles?useAdvancedQParser=true&q=gren_cpf eq "${request.query.document}"and login sw "${request.query.siteId}"&fields=total`;
+  let fullUrl =
+    HOST +
+    ENV +
+    `/profiles?useAdvancedQParser=true&q=gren_cpf eq "${request.query.document}"and login sw "${request.query.siteId}"&fields=total`;
 
   try {
     axiConfig({
@@ -125,7 +131,11 @@ router.get("/profiles/verifyEmail", function (request, response) {
     })
       .then((result) => {
         if (result.items.length > 0)
-          response.json({ hasEmail: true, message: "Email registered", active: result.items[0].active });
+          response.json({
+            hasEmail: true,
+            message: "Email registered",
+            active: result.items[0].active,
+          });
         else
           response.json({ hasEmail: false, message: "Email not recognized" });
       })
@@ -134,6 +144,61 @@ router.get("/profiles/verifyEmail", function (request, response) {
       });
   } catch (error) {
     console.log("Could not get" + error);
+  }
+});
+
+router.get("/filter/sizesParameter", async function (request, response) {
+  const { activeFieldName, siteId, priceGroupId, filterName } = request.query;
+
+  const bearerToken = request.headers.authorization;
+
+  const Nr = `AND(${activeFieldName})`;
+
+  const fullUrl =
+    process.env.OCC_URL_STORE +
+    `/ccstoreui/v1/search?searchType=simple&N=0&No=0&Nrpp=20&Ntt=&Nr=${Nr}&language=pt_BR&page=1`;
+
+  const sizesObject = {};
+
+  const getSizeObject = (string) => {
+    const regex = /[?&]N=([^&]+)/;
+
+    const match = regex.exec(string);
+
+    return match ? match[1] : null;
+  };
+
+  try {
+    axios
+      .get(
+        process.env.OCC_URL_STORE +
+          `/ccstoreui/v1/search?searchType=simple&N=0&No=0&Nrpp=20&Ntt=&Nr=${Nr}&language=pt_BR&page=1`,
+        {
+          headers: {
+            Authorization: bearerToken,
+            "X-CCAsset-Language": "pt-BR",
+            "x-ccsite": siteId,
+            "x-ccpricelistgroup": priceGroupId,
+          },
+        }
+      )
+      .then((result) => {
+        const grenSizeProps = result.data.navigation.navigation.filter(
+          (item) => item.displayName === filterName
+        );
+
+        grenSizeProps[0].refinements.forEach((item) => {
+          sizesObject[item.label] = getSizeObject(item.link);
+        });
+
+        response.status(200).json({ data: sizesObject });
+      })
+      .catch((err) => {
+        response.status(404).send("Could not get response from admin " + err);
+      });
+  } catch (error) {
+    console.log("Could not get" + error);
+    response.status(404);
   }
 });
 

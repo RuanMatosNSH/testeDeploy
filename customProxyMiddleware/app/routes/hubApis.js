@@ -82,6 +82,12 @@ router.post('/productSearch', async function (request, response) {
 });
 
 router.post('/shippingCosts', async function (request, response) {
+  request.body.request.items = request.body.request.items.map((item) => {
+    if (item.amount === 0) {
+      item.amount = item.rawTotalPrice;
+    }
+    return item;
+  });
   try {
     axiosOccProxy({
       method: 'POST',
