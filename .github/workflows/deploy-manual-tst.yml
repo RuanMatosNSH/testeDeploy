@@ -8,14 +8,14 @@ on:
                 description: "Insira os nomes das SSEs a serem enviadas, separados por espaços."
                 type: string
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# A workflow run is made up of one or more jobs that can run sequentially ou in parallel
 jobs:
-    # This workflow contains a single job called "build"
+    # This workflow contains a single job chamado "build"
     build:
-        # The type of runner that the job will run on
+        # The type of runner que o job will run on
         runs-on: ubuntu-latest
 
-        # To ensure that it will only run from the develop branch
+        # To ensure que it will only run from the develop branch
         if: github.ref == 'refs/heads/develop'
 
         env:
@@ -46,37 +46,48 @@ jobs:
                     cd ..
                   done
 
-            - name: Check and remove specific modules
+            - name: Check if ignoreConflict flag is active
+              id: check_ignoreConflict
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
-                    cd $folder
-                    # Lista de módulos a serem removidos
-                    modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
-
-                    for module in "${modules_to_remove[@]}"; do
-                      # Verifica se o módulo está instalado antes de tentar removê-lo
-                      if yarn list --depth=0 | grep -q $module; then
-                        yarn remove $module
+                    if [ -f "$folder/package.json" ]; then
+                      if jq -e '.ignoreConflict' "$folder/package.json" > /dev/null; then
+                        echo "::set-output name=ignoreConflict::$folder:true"
                       else
-                        echo "O módulo $module não está instalado em $folder."
+                        echo "::set-output name=ignoreConflict::$folder:false"
                       fi
-                    done
+                    else
+                      echo "::set-output name=ignoreConflict::$folder:false"
+                    fi
+                  done
 
-                    cd ..
+            - name: Check and remove specific modules
+              run: |
+                  for folder in ${{ github.event.inputs.list_sse_names  }}; do
+                    if [ "$(echo ${{ steps.check_ignoreConflict.outputs.ignoreConflict }} | jq .$folder)" != 'true' ]; then
+                      cd $folder
+                      # Lista de módulos a serem removidos
+                      modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
+
+                      for module in "${modules_to_remove[@]}"; do
+                        # Verifica se o módulo está instalado antes de tentar removê-lo
+                        if yarn list --depth=0 | grep -q $module; then
+                          yarn remove $module
+                        else
+                          echo "O módulo $module não está instalado em $folder."
+                        fi
+                      done
+
+                      cd ..
+                    fi
                   done
 
             - name: Zip changed folders
               run: |
-                  for folder in ${{ github.event.inputs.list_sse_names }}; do
+                  for folder in ${{ github.event.inputs.list_sse_names  }}; do
                     cd $folder
-                    zip -r "$folder.zip" *
+                    zip -r "../${folder}.zip" ./*
                     cd ..
-                  done
-
-            - name: Display contents of ZIP files
-              run: |
-                  for zip_file in $(find . -type f -name '*.zip'); do
-                    unzip -l "$zip_file"
                   done
 
             - name: Authenticate with OCC and Upload to Server Extensions
@@ -88,6 +99,9 @@ jobs:
                   echo "OCC Access Token: $OCC_ACCESS_TOKEN"
                   echo "Mandando zip code"
 
-                  for zip_file in $(find . -type f -name '*.zip'); do
-                    curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@$zip_file"  -F "filename=$(basename $zip_file)" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
+                  for folder in ${{ github.event.inputs.list_sse_names }}; do
+                    zip_file="${folder}.zip"
+                    echo "Enviando $zip_file para $OCC_ENDPOINT/ccadmin/v1/serverExtensions"
+                    curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${GITHUB_WORKSPACE}/${zip_file}" -F "filename=${zip_file}" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
+                    sleep 5
                   done
