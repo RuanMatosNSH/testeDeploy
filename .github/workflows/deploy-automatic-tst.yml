@@ -73,7 +73,9 @@ jobs:
       - name: Zip changed folders
         run: |
           for folder in ${{ env.CHANGED_FOLDERS }}; do
-            zip -r "${folder}.zip" "$folder"
+            cd $folder
+            zip -r "../${folder}.zip" ./*
+            cd ..
           done
 
       - name: Authenticate with OCC and Upload to Server Extensions
