@@ -79,11 +79,6 @@ jobs:
             cd ..
           done
 
-      - name: Display contents of ZIP files
-        run: |
-          for zip_file in $(find . -type f -name '*.zip'); do
-            unzip -l "$zip_file"
-          done
 
       - name: Authenticate with OCC and Upload to Server Extensions
         env:
@@ -94,6 +89,8 @@ jobs:
           echo "OCC Access Token: $OCC_ACCESS_TOKEN"
           echo "Mandando zip code"
 
-          for zip_file in $(find . -type f -name '*.zip'); do
-            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@$zip_file"  -F "filename=$(basename $zip_file)" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
+          for folder in ${{ env.CHANGED_FOLDERS }}; do
+            cd $folder
+            curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@$folder/$folder.zip"  -F "filename=$(basename $folder.zip)" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
+            cd ..
           done
