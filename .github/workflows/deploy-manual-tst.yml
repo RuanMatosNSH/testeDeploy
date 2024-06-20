@@ -31,8 +31,10 @@ jobs:
             - name: Install dependencies and remove specific modules
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
-                    cd $folder
-                    npm install
+                  cd $folder
+                  npm install
+                  ignoreConflict=$(jq -r '.ignoreConflict // "false"' package.json)
+                  if [ "$ignoreConflict" != "true" ]; then
                     modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
                     for module in "${modules_to_remove[@]}"; do
                       module_path="node_modules/$module"
@@ -43,7 +45,8 @@ jobs:
                         echo "O módulo $module não está instalado em $folder."
                       fi
                     done
-                    cd ..
+                  fi
+                  cd ..
                   done
 
             - name: Zip changed folders
