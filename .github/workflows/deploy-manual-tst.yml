@@ -51,20 +51,18 @@ jobs:
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
                     if [ -f "$folder/package.json" ]; then
-                      if jq -e '.ignoreConflict' "$folder/package.json" > /dev/null; then
-                        echo "::set-output name=ignoreConflict::$folder:true"
-                      else
-                        echo "::set-output name=ignoreConflict::$folder:false"
-                      fi
+                      ignoreConflict=$(jq -r '.ignoreConflict' "$folder/package.json" || echo "false")
+                      echo "::set-output name=ignoreConflict_$folder::$ignoreConflict"
                     else
-                      echo "::set-output name=ignoreConflict::$folder:false"
+                      echo "::set-output name=ignoreConflict_$folder::false"
                     fi
                   done
 
             - name: Check and remove specific modules
               run: |
-                  for folder in ${{ github.event.inputs.list_sse_names  }}; do
-                    if [ "$(echo ${{ steps.check_ignoreConflict.outputs.ignoreConflict }} | jq .$folder)" != 'true' ]; then
+                  for folder in ${{ github.event.inputs.list_sse_names }}; do
+                    ignoreConflict=$(echo "${{ steps.check_ignoreConflict.outputs.ignoreConflict_$folder }}")
+                    if [ "$ignoreConflict" != 'true' ]; then
                       cd $folder
                       # Lista de módulos a serem removidos
                       modules_to_remove=("winston" "express" "nconf" "https-proxy-agent")
@@ -84,7 +82,7 @@ jobs:
 
             - name: Zip changed folders
               run: |
-                  for folder in ${{ github.event.inputs.list_sse_names  }}; do
+                  for folder in ${{ github.event.inputs.list_sse_names }}; do
                     cd $folder
                     zip -r "../${folder}.zip" ./*
                     cd ..
