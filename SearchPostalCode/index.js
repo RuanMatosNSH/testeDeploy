@@ -3,7 +3,7 @@ const app = require('./src/app')
 const env = require('./src/utils/EnvironmentVariables')
 const dotenv = require('dotenv');
 dotenv.config();
-/* Teste 123456 */
+/* Teste 123456789 */
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 const port = env.PORT
 app.listen(port, function () {  
