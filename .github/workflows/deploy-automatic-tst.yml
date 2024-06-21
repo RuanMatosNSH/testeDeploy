@@ -34,6 +34,18 @@ jobs:
                   echo "Changed folders: $CHANGED_FOLDERS"
                   echo "CHANGED_FOLDERS=$CHANGED_FOLDERS" >> $GITHUB_ENV
 
+            - name: Identify if build is required
+              id: check_build_required
+              run: |
+                  build_required=false
+                  for folder in ${{ github.event.inputs.list_sse_names }}; do
+                    if git diff --name-only HEAD~1 | grep -qE "$folder/(package.json|webpack.config.js|.*\.(js|jsx|ts|tsx))"; then
+                      build_required=true
+                      break
+                    fi
+                  done
+                  echo "build_required=$build_required" >> $GITHUB_ENV
+
             - name: Install dependencies and remove specific modules
               run: |
                   for folder in ${{ env.CHANGED_FOLDERS }}; do
@@ -71,16 +83,15 @@ jobs:
                     done
                   cd ..
                   done
-
-            
-            - name: Build Application
+           
+            - name: Build application if required
+              if: env.build_required == 'true'
               run: |
-                  for folder in ${{ env.CHANGED_FOLDERS }}; do
+                for folder in ${{ github.event.inputs.list_sse_names }}; do
                   cd $folder
                   npm run build
                   cd ..
-                  done
-
+                done
 
             - name: Zip changed folders
               run: |
@@ -98,7 +109,6 @@ jobs:
                   OCC_ACCESS_TOKEN=$(curl -X POST -H "Authorization: Bearer $OCC_API_TOKEN" -d "grant_type=client_credentials" "$OCC_ENDPOINT/ccadmin/v1/login/" | jq -r '.access_token')
                   echo "OCC Access Token: $OCC_ACCESS_TOKEN"
                   echo "Mandando zip code"
-
                   for folder in ${{ env.CHANGED_FOLDERS }}; do
                     zip_file="${folder}.zip"
                     echo "Enviando $zip_file para $OCC_ENDPOINT/ccadmin/v1/serverExtensions"

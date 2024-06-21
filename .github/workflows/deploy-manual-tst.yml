@@ -28,6 +28,18 @@ jobs:
             - name: Install jq
               run: sudo apt-get install jq
 
+            - name: Identify if build is required
+              id: check_build_required
+              run: |
+                  build_required=false
+                  for folder in ${{ github.event.inputs.list_sse_names }}; do
+                    if git diff --name-only HEAD~1 | grep -qE "$folder/(package.json|webpack.config.js|.*\.(js|jsx|ts|tsx))"; then
+                      build_required=true
+                      break
+                    fi
+                  done
+                  echo "build_required=$build_required" >> $GITHUB_ENV
+
             - name: Install dependencies and remove specific modules
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
@@ -66,12 +78,13 @@ jobs:
                   cd ..
                   done
 
-            - name: Build Application
+            - name: Build application if required
+              if: env.build_required == 'true'
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
-                  cd $folder
-                  npm run build
-                  cd ..
+                    cd $folder
+                    npm run build
+                    cd ..
                   done
 
             - name: Zip changed folders
