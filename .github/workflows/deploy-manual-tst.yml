@@ -81,6 +81,7 @@ jobs:
             - name: Build application if required
               if: env.build_required == 'true'
               run: |
+                  echo "Buildando aplicação"
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
                     cd $folder
                     npm run build
