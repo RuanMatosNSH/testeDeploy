@@ -49,6 +49,23 @@ jobs:
                   cd ..
                   done
 
+            - name: DELETE NCONF
+              run: |
+                  for folder in ${{ github.event.inputs.list_sse_names }}; do
+                  cd $folder
+                    modules_to_remove=("nconf")
+                    for module in "${modules_to_remove[@]}"; do
+                      module_path="node_modules/$module"
+                      if [ -d "$module_path" ]; then
+                        rm -rf "$module_path"
+                        echo "O módulo $module foi removido de $folder."
+                      else
+                        echo "O módulo $module não está instalado em $folder."
+                      fi
+                    done
+                  cd ..
+                  done
+
             - name: Zip changed folders
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
