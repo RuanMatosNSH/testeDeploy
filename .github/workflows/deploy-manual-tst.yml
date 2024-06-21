@@ -66,6 +66,14 @@ jobs:
                   cd ..
                   done
 
+            - name: Build Application
+              run: |
+                  for folder in ${{ github.event.inputs.list_sse_names }}; do
+                  cd $folder
+                  npm run build
+                  cd ..
+                  done
+
             - name: Zip changed folders
               run: |
                   for folder in ${{ github.event.inputs.list_sse_names }}; do
