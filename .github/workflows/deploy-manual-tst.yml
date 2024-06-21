@@ -31,14 +31,14 @@ jobs:
             - name: Identify if build is required
               id: check_build_required
               run: |
-                  build_required=false
-                  for folder in ${{ github.event.inputs.list_sse_names }}; do
-                    if git diff --name-only HEAD~1 | grep -qE "$folder/(package.json|webpack.config.js|.*\.(js|jsx|ts|tsx))"; then
-                      build_required=true
-                      break
-                    fi
-                  done
-                  echo "build_required=$build_required" >> $GITHUB_ENV
+                build_required=false
+                for folder in ${{ github.event.inputs.list_sse_names }}; do
+                  if [ -f "$folder/package.json" ] && jq -e '.scripts.build' "$folder/package.json" > /dev/null; then
+                    build_required=true
+                    break
+                  fi
+                done
+                echo "build_required=$build_required" >> $GITHUB_ENV
 
             - name: Install dependencies and remove specific modules
               run: |
