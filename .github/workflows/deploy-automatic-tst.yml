@@ -45,9 +45,9 @@ jobs:
                           folders_to_delete+=("$folder")
                       fi
                   done
-                  echo "Existing folders: ${folders_to_upload[@]}"
+                  echo "SSEs para o upload: ${folders_to_upload[@]}"
                   echo "FOLDERS_TO_UPLOAD=${folders_to_upload[@]}" >> $GITHUB_ENV
-                  echo "Missing folders: ${folders_to_delete[@]}"
+                  echo "SSEs para deletar: ${folders_to_delete[@]}"
                   echo "FOLDERS_TO_DELETE=${folders_to_delete[@]}" >> $GITHUB_ENV
 
             - name: Identify if build is required
@@ -143,6 +143,6 @@ jobs:
                   OCC_ACCESS_TOKEN=$(curl -X POST -H "Authorization: Bearer $OCC_API_TOKEN" -d "grant_type=client_credentials" "$OCC_ENDPOINT/ccadmin/v1/login/" | jq -r '.access_token')
                   for folder in ${{ env.FOLDERS_TO_DELETE }}; do
                     echo "Deletando a pasta $folder via API"
-                    curl -X DELETE -H "Authorization: Bearer $OCC_ACCESS_TOKEN" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions/$folder"
+                    curl -X DELETE -H "Authorization: Bearer $OCC_ACCESS_TOKEN" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions/$folder.zip"
                     sleep 120
                   done
