@@ -9,8 +9,6 @@ jobs:
     build:
         runs-on: ubuntu-latest
 
-        if: github.ref == 'refs/heads/develop'
-
         env:
             NODE_OPTIONS: --max_old_space_size=8000
 
@@ -38,33 +36,33 @@ jobs:
               run: |
                   folders_to_upload=()
                   folders_to_delete=()
-                  for folder in ${{ env.CHANGED_FOLDERS }}; do
+                  for folder in $CHANGED_FOLDERS; do
                       if [ -d "$folder" ]; then
                           folders_to_upload+=("$folder")
                       else
                           folders_to_delete+=("$folder")
                       fi
                   done
-                  echo "SSEs para o upload: ${folders_to_upload[@]}"
+                  echo "Existing folders: ${folders_to_upload[@]}"
                   echo "FOLDERS_TO_UPLOAD=${folders_to_upload[@]}" >> $GITHUB_ENV
-                  echo "SSEs para deletar: ${folders_to_delete[@]}"
+                  echo "Missing folders: ${folders_to_delete[@]}"
                   echo "FOLDERS_TO_DELETE=${folders_to_delete[@]}" >> $GITHUB_ENV
 
-            - name: Identify if build is required
+            - name: Identify if build is required per folder
               id: check_build_required
               run: |
-                  build_required=false
-                  for folder in ${{ env.FOLDERS_TO_UPLOAD }}; do
+                  folders_to_build=()
+                  for folder in ${{ steps.check_folders_method.outputs.FOLDERS_TO_UPLOAD }}; do
                     if [ -f "$folder/package.json" ] && jq -e '.scripts.build' "$folder/package.json" > /dev/null; then
-                      build_required=true
-                      break
+                      folders_to_build+=("$folder")
                     fi
                   done
-                  echo "build_required=$build_required" >> $GITHUB_ENV
+                  echo "Folders that require build: ${folders_to_build[@]}"
+                  echo "FOLDERS_TO_BUILD=${folders_to_build[@]}" >> $GITHUB_ENV
 
             - name: Install dependencies and remove specific modules
               run: |
-                  for folder in ${{ env.FOLDERS_TO_UPLOAD }}; do
+                  for folder in ${{ steps.check_folders_method.outputs.FOLDERS_TO_UPLOAD }}; do
                   cd $folder
                   npm install
                   ignoreConflict=$(jq -r '.ignoreConflict // "false"' package.json)
@@ -83,28 +81,11 @@ jobs:
                   cd ..
                   done
 
-            - name: DELETE NCONF
-              run: |
-                  for folder in ${{ env.FOLDERS_TO_UPLOAD }}; do
-                  cd $folder
-                    modules_to_remove=("nconf")
-                    for module in "${modules_to_remove[@]}"; do
-                      module_path="node_modules/$module"
-                      if [ -d "$module_path" ]; then
-                        rm -rf "$module_path"
-                        echo "O módulo $module foi removido de $folder."
-                      else
-                        echo "O módulo $module não está instalado em $folder."
-                      fi
-                    done
-                  cd ..
-                  done
-
             - name: Build application if required
-              if: env.build_required == 'true'
+              if: env.FOLDERS_TO_BUILD != ''
               run: |
-                  echo "Buildando aplicação"
-                  for folder in ${{ env.FOLDERS_TO_UPLOAD }}; do
+                  for folder in ${{ env.FOLDERS_TO_BUILD }}; do
+                    echo "Building folder $folder"
                     cd $folder
                     npm run build
                     cd ..
@@ -112,37 +93,37 @@ jobs:
 
             - name: Zip changed folders
               run: |
-                  for folder in ${{ env.FOLDERS_TO_UPLOAD }}; do
+                  for folder in ${{ steps.check_folders_method.outputs.FOLDERS_TO_UPLOAD }}; do
                     cd $folder
                     zip -r "../${folder}.zip" ./*
                     cd ..
                   done
 
             - name: Authenticate with OCC and Upload to Server Extensions
-              if: env.FOLDERS_TO_UPLOAD != ''
+              if: ${{ steps.check_folders_method.outputs.FOLDERS_TO_UPLOAD }} != ''
               env:
                   OCC_ENDPOINT: ${{ secrets.OCC_TST_ENDPOINT }}
                   OCC_API_TOKEN: ${{ secrets.OCC_TST_API_TOKEN }}
               run: |
-                  OCC_ACCESS_TOKEN=$(curl -X POST -H "Authorization: Bearer $OCC_API_TOKEN" -d "grant_type=client_credentials" "$OCC_ENDPOINT/ccadmin/v1/login/" | jq -r '.access_token')
-                  echo "OCC Access Token: $OCC_ACCESS_TOKEN"
                   echo "Mandando zip code"
-                  for folder in ${{ env.FOLDERS_TO_UPLOAD }}; do
+                  for folder in ${{ steps.check_folders_method.outputs.FOLDERS_TO_UPLOAD }}; do
+                    OCC_ACCESS_TOKEN=$(curl -X POST -H "Authorization: Bearer $OCC_API_TOKEN" -d "grant_type=client_credentials" "$OCC_ENDPOINT/ccadmin/v1/login/" | jq -r '.access_token')
                     zip_file="${folder}.zip"
                     echo "Enviando $zip_file para $OCC_ENDPOINT/ccadmin/v1/serverExtensions"
                     curl -X POST -H "Authorization: Bearer $OCC_ACCESS_TOKEN" -F "fileUpload=@${GITHUB_WORKSPACE}/${zip_file}" -F "filename=${zip_file}" -F "force=true" -F "uploadType=extensions" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions"
                     sleep 120
                   done
 
-            - name: Delete missing folders via API
-              if: env.FOLDERS_TO_DELETE != ''
+            - name: Delete SSEs 🗑️
+              if: ${{ steps.check_folders_method.outputs.FOLDERS_TO_DELETE }} != ''
               env:
                   OCC_ENDPOINT: ${{ secrets.OCC_TST_ENDPOINT }}
                   OCC_API_TOKEN: ${{ secrets.OCC_TST_API_TOKEN }}
               run: |
+                  echo "Deletando SSEs"
+                  for folder in ${{ steps.check_folders_method.outputs.FOLDERS_TO_DELETE }}; do
                   OCC_ACCESS_TOKEN=$(curl -X POST -H "Authorization: Bearer $OCC_API_TOKEN" -d "grant_type=client_credentials" "$OCC_ENDPOINT/ccadmin/v1/login/" | jq -r '.access_token')
-                  for folder in ${{ env.FOLDERS_TO_DELETE }}; do
-                    echo "Deletando a pasta $folder via API"
-                    curl -X DELETE -H "Authorization: Bearer $OCC_ACCESS_TOKEN" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions/$folder.zip"
+                    echo "Deletando a SSE $folder via API"
+                    curl -X DELETE -H "Authorization: Bearer $OCC_ACCESS_TOKEN" "$OCC_ENDPOINT/ccadmin/v1/serverExtensions/$folder"
                     sleep 120
                   done
