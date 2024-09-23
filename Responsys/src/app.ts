@@ -1,6 +1,6 @@
 import express from "express";
 import routes from "./routes";
-/* Teste */
+/* Teste 1 */
 const app = express();
 app.use(express.json());
 app.use("/responsys", routes);
