@@ -1,0 +1,54 @@
+{
+  "name": "responsys",
+  "version": "1.0.0",
+  "description": "SSE responsible for communication between the front OCC and responsys",
+  "license": "SEE LICENSE IN LICENSE.TXT",
+  "author": "Rodrigo Lavratti",
+  "ignoreConflict": true,
+  "whitelistUrls": [],
+  "main": "./dist/server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "ts-node-dev --inspect --respawn src/server.ts --ignore-watch node_modules --transpile-only",
+    "start": "node ./dist/server.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.12",
+    "prettier": "^3.2.5",
+    "ts-node-dev": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "8.57.0",
+    "typescript": "^5.4.5",
+    "https-proxy-agent": "^5.0.1"
+  },
+  "allowedUrls": [
+    "https://gbm1rs4-api.responsys.ocs.oraclecloud.com",
+    "https://geg1qsf-api.responsys.ocs.oraclecloud.com",
+    "https://gk71qiq-api.responsys.ocs.oraclecloud.com",
+    "https://ghd1qk2-api.responsys.ocs.oraclecloud.com",
+    "https://gcj1qke-api.responsys.ocs.oraclecloud.com",
+    "https://gb91qk1-api.responsys.ocs.oraclecloud.com",
+    "https://g991qjz-api.responsys.ocs.oraclecloud.com",
+    "https://gjb1qk0-api.responsys.ocs.oraclecloud.com",
+    "https://relacionamento.lojagrendene.com.br/pub/rf",
+    "https://relacionamento.melissa.com.br/pub/rf",
+    "https://relacionamento.rider.com.br/pub/rf"
+  ],
+  "publicUrls": [
+    "/ccstorex/custom/responsys/productOpened",
+    "/ccstorex/custom/responsys/collectionOpened",
+    "/ccstorex/custom/responsys/sendWishlist",
+    "/ccstorex/custom/responsys/sendFormRequest",
+    "/ccstorex/custom/responsys/sendOrderResponsysWebhook"
+  ]
+}
