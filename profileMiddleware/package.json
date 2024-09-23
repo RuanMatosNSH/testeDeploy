@@ -1,0 +1,36 @@
+{
+  "name": "profile-middleware",
+  "version": "1.0.0",
+  "description": "SSE is responsible for intermediating the creation and updating of profiles, allowing the use of admin endpoints",
+  "license": "SEE LICENSE IN LICENSE.TXT",
+  "author": "Alexandre Silva",
+  "ignoreConflict": true,
+  "whitelistUrls": [],
+  "main": "./dist/server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "ts-node-dev --inspect --respawn src/server.ts --ignore-watch node_modules --transpile-only",
+    "start": "node ./dist/server.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.12",
+    "prettier": "^3.2.5",
+    "ts-node-dev": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "8.57.0",
+    "typescript": "^5.4.5"
+  },
+  "publicUrls": [
+    "/ccstorex/custom/v1/profiles"
+  ]
+}

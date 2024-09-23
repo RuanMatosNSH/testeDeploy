@@ -64,11 +64,11 @@ requestAdmin.interceptors.request.use(
 
       return config;
     } catch (error) {
-      throw new Error("Erro no login 123456789101112: \n" + error);
+      throw new Error("Erro no login: \n" + error);
     }
   },
   (error) => {
-    throw new Error("Erro no pré-login 11345: \n" + error);
+    throw new Error("Erro no pré-login: \n" + error);
   }
 );
 

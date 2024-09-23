@@ -61,7 +61,7 @@ requestAdmin.interceptors.response.use(async (response) => {
   return response.data;
 }, (error) => {
   if ((error.response || {}).status === 404) {
-    console.log('Error 404 bugizito 2345', error.response.data);
+    console.log('Error 404', error.response.data);
     return error.response.data;
   }
 
